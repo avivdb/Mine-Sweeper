@@ -1,0 +1,18 @@
+table {
+    margin: auto;
+    background-color: lightgray;
+    table-layout: fixed;
+}
+
+.cell {
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+    text-align: center;
+}
+
+table,
+.cell {
+    border: black 1px solid;
+    border-collapse: collapse;
+}
