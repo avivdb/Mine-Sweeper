@@ -1,34 +1,5 @@
 'use strict'
 
-var gGame = {
-    isOn: true,
-    shownCount: 0,
-    markedCount: 0,
-    secsPassed: 0
-}
-
-var gLevel = {
-    SIZE: 4,
-    MINES: 2
-}
-
-var gBoard = []
-var gMinePositions = []
-const MINE = '💣'
-const FLAG = '🏳️'
-var NUM_TO_SHOW = gLevel.SIZE ** 2 - gLevel.MINES
-
-
-function onInit() {
-    gBoard = []
-    gGame.isOn = true
-    gBoard = buildBoard()
-    addMines(gLevel.MINES)
-    setMinesNegsCount(gBoard)
-    renderBoard(gBoard)
-
-}
-
 function buildBoard() {
 
     const board = []
@@ -79,35 +50,73 @@ function renderCell(location, value) {
 
 function onCellClicked(elCell) {
 
-    if (!gGame.isOn) {
-        return
-    }
-
+    if (!gGame.isOn) return
+    renderSmiley('😬')
     var pos = getPosition(elCell)
     var cell = gBoard[pos.i][pos.j]
 
+    if (numCellClick === 0)
+        addNegs(pos, gBoard)
+    if (numCellClick === 1) {
+        addMines(gLevel.MINES)
+        setMinesNegsCount(gBoard)
+    }
+
+
+    console.log('numCellClick:', numCellClick);
+
     if (cell.isMarked) return
-    if (cell.minesAroundCount === MINE) gameOver()
+    if (cell.isShown) return
+    if (cell.minesAroundCount === MINE) {
+        gameOver()
+        return
+    }
+
+    if (cell.minesAroundCount === 0 && numCellClick > 0) expandshown(pos.i, pos.j, gBoard)
 
     gGame.shownCount++
     checkGameOver()
+    renderSmiley('😀')
     const className = `cell cell-${pos.i}-${pos.j}`
     var strHTML = `<td  class="${className}"><span class="content">${cell.minesAroundCount}</span></td>`
     renderCell(pos, strHTML)
     cell.isShown = true
+    numCellClick++
 
 }
 
-function getPosition(elCell) {
+function addNegs(pos, mat) {
 
-    var list = elCell.classList
-    var posStr = list[1]
-    var posArr = posStr.split("-")
-    var i = +posArr[1]
-    var j = +posArr[2]
-    var pos = { i, j }
+    for (var i = pos.i - 1; i <= pos.i + 1; i++) {
+        if (i < 0 || i >= mat.length) continue
+        for (var j = pos.j - 1; j <= pos.j + 1; j++) {
 
-    return pos
+            if (j < 0 || j >= mat[i].length) continue
+            if (i === pos.i && j === pos.j) continue
+            // console.log('mat[i][j]:', mat[i][j]);
+            mat[i][j].minesAroundCount = 1
+        }
+    }
+
+}
+
+function expandshown(cellI, cellJ, mat) { // 7,0
+
+    for (var i = cellI - 1; i <= cellI + 1; i++) {
+        if (i < 0 || i >= mat.length) continue
+        for (var j = cellJ - 1; j <= cellJ + 1; j++) {
+            if (j < 0 || j >= mat[i].length) continue
+            if (i === cellI && j === cellJ) continue
+
+            var pos = { i: i, j: j }
+            var cell = mat[i][j]
+            if (!cell.isShown) gGame.shownCount++
+            cell.isShown = true
+            const className = `cell cell-${pos.i}-${pos.j}`
+            var strHTML = `<td  class="${className}"><span class="content">${cell.minesAroundCount}</span></td>`
+            renderCell(pos, strHTML)
+        }
+    }
 
 }
 
@@ -131,22 +140,9 @@ function setMinesNegsCount(board) {
             var mineCount = countNegs(i, j, board)
             if (board[i][j].minesAroundCount === MINE) continue
             board[i][j].minesAroundCount = mineCount
-            board[i][j].minesAroundCount = mineCount
         }
 
     }
-
-}
-
-function gameOver() {
-
-    gGame.isOn = false
-    for (var i = 0; i < gMinePositions.length; i++) {
-        var pos = gMinePositions[i]
-        gBoard[pos.i][pos.j].isShown = true
-        renderCell(pos, MINE)
-    }
-    console.log('gameover');
 
 }
 
@@ -181,30 +177,7 @@ function flagMine(event) {
 
 }
 
-function checkGameOver() {
-
-    if (gGame.markedCount === gLevel.MINES && gGame.shownCount === NUM_TO_SHOW) {
-        console.log('you won');
-    }
-}
-
-function setLevel(lvl) {
-    switch (lvl) {
-        case 'beginner':
-            gLevel.SIZE = 4
-            gLevel.MINES = 2
-            onInit()
-            break
-        case 'medium':
-            gLevel.SIZE = 8
-            gLevel.MINES = 14
-            onInit()
-            break
-        case 'expert':
-            gLevel.SIZE = 12
-            gLevel.MINES = 32
-            onInit()
-            break
-    }
-
+function renderSmiley(smiley) {
+    var elSmiley = document.querySelector(".smiley")
+    elSmiley.innerText = smiley
 }

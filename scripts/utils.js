@@ -38,6 +38,8 @@ function countNegs(cellI, cellJ, mat) { // 7,0
     return NegsCount
 }
 
+
+
 function findEmptyPos(gBoard) {
     // console.log('gBoard:', gBoard);
     var emptyPoss = []
@@ -57,4 +59,17 @@ function findEmptyPos(gBoard) {
     var randPos = emptyPoss[randIdx]
 
     return randPos
+}
+
+function getPosition(elCell) {
+
+    var list = elCell.classList
+    var posStr = list[1]
+    var posArr = posStr.split("-")
+    var i = +posArr[1]
+    var j = +posArr[2]
+    var pos = { i, j }
+
+    return pos
+
 }

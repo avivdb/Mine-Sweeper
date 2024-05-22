@@ -16,3 +16,19 @@ table,
     border: black 1px solid;
     border-collapse: collapse;
 }
+
+.smiley {
+    text-align: center;
+    font-size: 30px;
+    margin: 20px auto;
+}
+
+.level {
+    text-align: center;
+}
+
+.level button {
+    width: 100px;
+    display: inline-block;
+    margin: 20px 10px;
+}
