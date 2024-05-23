@@ -1,4 +1,8 @@
 'use strict'
+var startTime;
+var elapsedTime = 0;
+var timerInterval = null
+var running = false;
 
 function getRandomIntInclusive(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min
@@ -40,22 +44,21 @@ function countNegs(cellI, cellJ, mat) { // 7,0
 
 
 
-function findEmptyPos(gBoard) {
+function findEmptyPos(board, firstClickPos) {
     // console.log('gBoard:', gBoard);
     var emptyPoss = []
 
-    for (var i = 0; i < gBoard.length; i++) {
-        for (var j = 0; j < gBoard[0].length; j++) {
-            var cell = gBoard[i][j]
-            // console.log('cell:', cell);
-            if (cell.minesAroundCount === 0) {
-                // console.log('empty');
+    for (var i = 0; i < board.length; i++) {
+        for (var j = 0; j < board[0].length; j++) {
+            var cell = board[i][j]
+            if (!cell.isMine && !(i >= firstClickPos.i - 1 && i <= firstClickPos.i + 1 && j >= firstClickPos.j - 1 && j <= firstClickPos.j + 1)) {
                 var pos = { i: i, j: j }
                 emptyPoss.push(pos)
             }
         }
     }
-    var randIdx = getRandomIntInclusive(0, emptyPoss.length)
+    if (emptyPoss.length === 0) return null;
+    var randIdx = getRandomIntInclusive(0, emptyPoss.length - 1)
     var randPos = emptyPoss[randIdx]
 
     return randPos
@@ -71,5 +74,34 @@ function getPosition(elCell) {
     var pos = { i, j }
 
     return pos
+
+}
+
+function startWatch() {
+    if (timerInterval) clearInterval(timerInterval);
+    startTime = Date.now() - elapsedTime;
+    timerInterval = setInterval(updateTime, 10);
+    running = true;
+
+}
+function updateTime() {
+
+    elapsedTime = Date.now() - startTime;
+    document.getElementById("display").textContent = (elapsedTime / 1000).toFixed(3);
+}
+function stopWatch() {
+    console.log('stop')
+    running = false;
+    clearInterval(timerInterval)
+    timerInterval = null;
+}
+
+function resetWatch() {
+    if (timerInterval) clearInterval(timerInterval);
+    elapsedTime = 0
+    startTime = 0
+    // elapsedTime = 0;
+    timerInterval = null
+    running = false;
 
 }

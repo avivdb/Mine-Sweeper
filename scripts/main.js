@@ -51,54 +51,44 @@ function renderCell(location, value) {
 function onCellClicked(elCell) {
 
     if (!gGame.isOn) return
-    renderSmiley('😬')
     var pos = getPosition(elCell)
+    renderSmiley('😬')
     var cell = gBoard[pos.i][pos.j]
 
-    if (numCellClick === 0)
-        addNegs(pos, gBoard)
-    if (numCellClick === 1) {
-        addMines(gLevel.MINES)
+    if (numCellClick === 0) {
+
+        addMines(gLevel.MINES, pos)
         setMinesNegsCount(gBoard)
-    }
+        expandshown(pos.i, pos.j, gBoard)
+        startWatch()
+        setTimeout(() => {
+            renderSmiley('😀')
 
-
-    console.log('numCellClick:', numCellClick);
-
-    if (cell.isMarked) return
-    if (cell.isShown) return
-    if (cell.minesAroundCount === MINE) {
-        gameOver()
-        return
-    }
-
-    if (cell.minesAroundCount === 0 && numCellClick > 0) expandshown(pos.i, pos.j, gBoard)
-
-    gGame.shownCount++
-    checkGameOver()
-    renderSmiley('😀')
-    const className = `cell cell-${pos.i}-${pos.j}`
-    var strHTML = `<td  class="${className}"><span class="content">${cell.minesAroundCount}</span></td>`
-    renderCell(pos, strHTML)
-    cell.isShown = true
-    numCellClick++
-
-}
-
-function addNegs(pos, mat) {
-
-    for (var i = pos.i - 1; i <= pos.i + 1; i++) {
-        if (i < 0 || i >= mat.length) continue
-        for (var j = pos.j - 1; j <= pos.j + 1; j++) {
-
-            if (j < 0 || j >= mat[i].length) continue
-            if (i === pos.i && j === pos.j) continue
-            // console.log('mat[i][j]:', mat[i][j]);
-            mat[i][j].minesAroundCount = 1
+        }, 130)
+    } else {
+        if (cell.isMarked || cell.isShown) return;
+        if (cell.minesAroundCount === MINE) {
+            gameOver()
+            return
         }
-    }
+        if (cell.minesAroundCount === 0) {
+            expandshown(pos.i, pos.j, gBoard)
+        }
 
+        gGame.shownCount++
+        checkGameOver()
+        const className = `cell cell-${pos.i}-${pos.j}`
+        var strHTML = `<td  class="${className}"><span class="content">${cell.minesAroundCount}</span></td>`
+        renderCell(pos, strHTML)
+        cell.isShown = true
+        setTimeout(() => {
+            renderSmiley('😀')
+
+        }, 130)
+    }
+    numCellClick++
 }
+
 
 function expandshown(cellI, cellJ, mat) { // 7,0
 
@@ -120,16 +110,18 @@ function expandshown(cellI, cellJ, mat) { // 7,0
 
 }
 
-function addMines(numMines) {
+function addMines(numMines, firstClickPos) {
+    var minesAdded = 0
+    while (minesAdded < numMines) {
+        var pos = findEmptyPos(gBoard, firstClickPos);
+        if (!gBoard[pos.i][pos.j].isMine && (pos.i !== firstClickPos.i || pos.j !== firstClickPos.j)) {
+            gBoard[pos.i][pos.j].minesAroundCount = MINE;
+            gBoard[pos.i][pos.j].isMine = true;
+            gMinePositions.push(pos);
+            minesAdded++;
 
-    for (var i = 0; i < numMines; i++) {
-        var pos = findEmptyPos(gBoard)
-        gBoard[pos.i][pos.j].minesAroundCount = MINE
-        gBoard[pos.i][pos.j].isMine = true
-        gMinePositions.push(pos)
-
+        }
     }
-
 }
 
 function setMinesNegsCount(board) {
@@ -158,7 +150,7 @@ function flagMine(event) {
         const className = `cell cell-${pos.i}-${pos.j}`
         var cell = gBoard[pos.i][pos.j]
         var strHtml = `<td onclick="onCellClicked(this)" oncontextmenu="flagMine(event)" class="${className}"><span style="visibility:hidden" class="minesAroundCount">${cell}</span></td>`
-
+        if (cell.isShown || !gGame.isOn) return
         if (!cell.isMarked) {
 
             cell.isMarked = true
