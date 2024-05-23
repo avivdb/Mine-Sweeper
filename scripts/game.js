@@ -5,22 +5,27 @@ var gGame = {
     secsPassed: 0,
     lives: 3
 }
-
 var gLevel = {
     SIZE: 4,
     MINES: 2
 }
+var gBestScore = {
+    easy: Infinity,
+    medium: Infinity,
+    expert: Infinity
+}
 
 var numCellClick = 0
 var gBoard = []
+var gBoards = [gBoard]
 var gMinePositions = []
+var NUM_TO_SHOW = gLevel.SIZE ** 2 - gLevel.MINES
+var gNegsToHide = []
+var gIsMegaHint = false
+var gIsHint = false;
+
 const MINE = '💣'
 const FLAG = '🏳️'
-var NUM_TO_SHOW = gLevel.SIZE ** 2 - gLevel.MINES
-
-gIsHint = false;
-var gNegsToHide = []
-var gBestScore = Infinity
 
 function onInit() {
     resetGame()
@@ -28,8 +33,40 @@ function onInit() {
     resetHints()
     gBoard = buildBoard()
     console.table('gBoard:', gBoard);
-    // document.getElementById("result").innerHTML = localStorage.getItem("bestscore");
+    loadBestScore()
     renderBoard(gBoard)
+
+}
+
+function saveBestScore() {
+    if (gLevel.SIZE === 4) {
+        if (elapsedTime < localStorage.getItem("bestscoreeasy")) {
+            gBestScore.easy = elapsedTime
+            localStorage.setItem("bestscoreeasy", gBestScore.easy);
+        }
+    } else if (gLevel.SIZE === 8) {
+        if (elapsedTime < localStorage.getItem("bestscoremedium")) {
+            gBestScore.medium = elapsedTime
+            localStorage.setItem("bestscoremedium", gBestScore.medium);
+        }
+
+    } else {
+        if (elapsedTime < localStorage.getItem("bestscoreexpert")) {
+            gBestScore.expert = elapsedTime
+            localStorage.setItem("bestscoreexpert", gBestScore.expert);
+        }
+
+    }
+
+}
+
+function loadBestScore() {
+    if (gLevel.SIZE === 4)
+        document.getElementById("best-score").innerHTML = localStorage.getItem("bestscoreeasy");
+    else if (gLevel.SIZE === 8)
+        document.getElementById("best-score").innerHTML = localStorage.getItem("bestscoremedium");
+    else
+        document.getElementById("best-score").innerHTML = localStorage.getItem("bestscoreexpert");
 
 }
 
@@ -55,10 +92,7 @@ function checkGameOver() {
         console.log('you won');
         stopWatch()
         renderSmiley('😁')
-        if (elapsedTime < gBestScore) {
-            gBestScore = elapsedTime
-            localStorage.setItem("bestscore", gBestScore);
-        }
+        saveBestScore()
     }
 }
 
@@ -102,8 +136,10 @@ function resetGame() {
     numCellClick = 0
     renderLives()
     renderSmiley('😀')
+    loadBestScore()
 
 }
+
 function renderLives() {
     elLives = document.querySelector(".lives")
     console.log('elLives:', elLives);
@@ -115,18 +151,17 @@ function renderLives() {
 }
 
 function getHint(elHint) {
-    // console.log('elHint:', elHint);
     if (elHint.classList.contains('clicked-hint')) return
     elHint.classList.add('clicked-hint')
     gIsHint = true;
     const cells = document.querySelectorAll(".cell")
     cells.forEach(cell => {
-        cell.addEventListener('click', hintclickedHandler)
+        cell.addEventListener('click', hintClickedHandler)
     })
 
 }
 
-function hintclickedHandler(event) {
+function hintClickedHandler(event) {
     elCell = event.target
     var pos = getPosition(elCell)
     console.log('elCell:', elCell);
@@ -137,7 +172,7 @@ function hintclickedHandler(event) {
     }, 1000)
     const cells = document.querySelectorAll(".cell")
     cells.forEach(cell => {
-        cell.removeEventListener('click', hintclickedHandler)
+        cell.removeEventListener('click', hintClickedHandler)
     })
     gIsHint = false
 }
@@ -181,5 +216,52 @@ function resetHints() {
     var strHTML = `<span onclick="getHint(this)" class="hint hint1">💡</span><span onclick="getHint(this)"
     class="hint hint2">💡</span><span onclick="getHint(this)" class="hint hint3">💡</span>`
     elhints.innerHTML = strHTML
+
+}
+
+function undo() {
+    if (gBoards.length > 2)
+        renderUndo(gBoards[gBoards.length - 1])
+    else renderBoard()
+    gBoards.pop()
+    gGame.shownCount--
+
+}
+
+function renderUndo(board) {
+
+    for (var i = 0; i < board.length; i++) {
+
+        for (var j = 0; j < board[0].length; j++) {
+            const cell = board[i][j]
+            const className = `cell cell-${i}-${j}`
+            var strHTML = (cell.isShown) ? `<td  class="${className}"><span class="content">${cell.minesAroundCount}</span></td>` : `<td onclick="onCellClicked(this)" oncontextmenu="flagMine(event)" class="${className}"><span style="visibility:hidden" class="minesAroundCount">${cell}</span></td>`
+            renderCell({ i: i, j: j }, strHTML)
+            console.log('i,j', i, j);
+
+
+        }
+    }
+}
+
+function getMegaHint(elMegaHint) {
+    // if (gIsMegaHint) return
+    gIsMegaHint = true;
+    const cells = document.querySelectorAll(".cell")
+    cells.forEach(cell => {
+        cell.addEventListener('click', megaHintClickedHandler)
+    })
+
+}
+
+function megaHintClickedHandler(event) {
+    elCell = event.target
+    var pos = getPosition(elCell)
+    console.log('elCell:', elCell);
+    console.log('pos:', pos);
+
+}
+
+function revealMegaHint(pos1, pos2, mat) {
 
 }

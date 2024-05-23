@@ -3,7 +3,7 @@ var startTime;
 var elapsedTime = 0;
 var timerInterval = null
 var running = false;
-
+var gIsDark = false
 function getRandomIntInclusive(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min
 }
@@ -106,4 +106,16 @@ function resetWatch() {
     document.getElementById("display").textContent = (0).toFixed(3)
 
 
+}
+function changeStyleDark() {
+    var elLink = document.getElementById("style")
+    if (gIsDark) {
+        gIsDark = false
+        elLink.href = "styles/style.css"
+    } else {
+        gIsDark = true
+        elLink.href = "styles/style_dark.css"
+    }
+
+    console.log('elLink:', elLink);
 }

@@ -52,6 +52,7 @@ function onCellClicked(elCell) {
 
     if (!gGame.isOn) return
     if (gIsHint) return
+    if (gIsMegaHint) return
     var pos = getPosition(elCell)
     renderSmiley('😬')
     var cell = gBoard[pos.i][pos.j]
@@ -69,28 +70,32 @@ function onCellClicked(elCell) {
     }
     else {
         if (cell.isMarked || cell.isShown) return;
-        if (cell.minesAroundCount === MINE) {
+        if (cell.isMine) {
             gameOver()
             return
         }
         if (cell.minesAroundCount === 0) {
             expandshown(pos.i, pos.j, gBoard)
-        }
+        } else {
+            cell.isShown = true
+            gGame.shownCount++
+            const className = `cell cell-${pos.i}-${pos.j}`
+            var strHTML = `<td  class="${className}"><span class="content">${cell.minesAroundCount}</span></td>`
 
+            renderCell(pos, strHTML)
+        }
     }
-    gGame.shownCount++
+
+    var gBoardCopy = [...gBoard]
+    gBoards.push(gBoardCopy)
+    console.table('gBoardCopy:', gBoardCopy);
     checkGameOver()
-    const className = `cell cell-${pos.i}-${pos.j}`
-    var strHTML = `<td  class="${className}"><span class="content">${cell.minesAroundCount}</span></td>`
-    renderCell(pos, strHTML)
-    cell.isShown = true
     setTimeout(() => {
         renderSmiley('😀')
 
     }, 130)
     numCellClick++
 }
-
 
 function expandshown(cellI, cellJ, mat) { // 7,0
 
@@ -102,11 +107,16 @@ function expandshown(cellI, cellJ, mat) { // 7,0
 
             var pos = { i: i, j: j }
             var cell = mat[i][j]
-            if (!cell.isShown) gGame.shownCount++
-            cell.isShown = true
-            const className = `cell cell-${pos.i}-${pos.j}`
-            var strHTML = `<td  class="${className}"><span class="content">${cell.minesAroundCount}</span></td>`
-            renderCell(pos, strHTML)
+            if (!cell.isShown && !cell.isMarked && !cell.isMine) {
+                cell.isShown = true
+                gGame.shownCount++
+                const className = `cell cell-${pos.i}-${pos.j}`
+                var strHTML = `<td  class="${className}"><span class="content">${cell.minesAroundCount}</span></td>`
+                renderCell(pos, strHTML)
+                if (cell.minesAroundCount === 0) expandshown(i, j, mat)
+
+            }
+            // expandshown(i, j, mat)
         }
     }
 
