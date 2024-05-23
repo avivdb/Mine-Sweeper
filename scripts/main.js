@@ -51,6 +51,7 @@ function renderCell(location, value) {
 function onCellClicked(elCell) {
 
     if (!gGame.isOn) return
+    if (gIsHint) return
     var pos = getPosition(elCell)
     renderSmiley('😬')
     var cell = gBoard[pos.i][pos.j]
@@ -65,7 +66,8 @@ function onCellClicked(elCell) {
             renderSmiley('😀')
 
         }, 130)
-    } else {
+    }
+    else {
         if (cell.isMarked || cell.isShown) return;
         if (cell.minesAroundCount === MINE) {
             gameOver()
@@ -75,17 +77,17 @@ function onCellClicked(elCell) {
             expandshown(pos.i, pos.j, gBoard)
         }
 
-        gGame.shownCount++
-        checkGameOver()
-        const className = `cell cell-${pos.i}-${pos.j}`
-        var strHTML = `<td  class="${className}"><span class="content">${cell.minesAroundCount}</span></td>`
-        renderCell(pos, strHTML)
-        cell.isShown = true
-        setTimeout(() => {
-            renderSmiley('😀')
-
-        }, 130)
     }
+    gGame.shownCount++
+    checkGameOver()
+    const className = `cell cell-${pos.i}-${pos.j}`
+    var strHTML = `<td  class="${className}"><span class="content">${cell.minesAroundCount}</span></td>`
+    renderCell(pos, strHTML)
+    cell.isShown = true
+    setTimeout(() => {
+        renderSmiley('😀')
+
+    }, 130)
     numCellClick++
 }
 
@@ -171,5 +173,5 @@ function flagMine(event) {
 
 function renderSmiley(smiley) {
     var elSmiley = document.querySelector(".smiley")
-    elSmiley.innerText = smiley
+    elSmiley.innerHTML = `<span onclick="onInit()">${smiley}</span>`
 }

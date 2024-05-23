@@ -1,3 +1,7 @@
+* {
+    box-sizing: border-box;
+}
+
 h1 {
     text-align: center;
     padding-top: 10px;
@@ -8,6 +12,7 @@ table {
     background-color: #4a4a4a;
     border: 5px solid #333;
     table-layout: fixed;
+
 }
 
 .cell {
@@ -21,21 +26,17 @@ table {
     cursor: pointer;
 }
 
+.cell:hover {
+    background: linear-gradient(145deg, #b4b4b4, #858585);
+    border: 2px solid #333;
+    box-shadow: inset 0 0 5px #000, inset 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
 .cell:active {
     transform: scale(0.95);
     box-shadow: inset 0 0 10px #000;
 }
 
-/* .cell::before { */
-/* content: ""; */
-/* position: absolute; */
-/* width: 100%; */
-/* height: 100%; */
-/* background: radial-gradient(circle, rgba(255, 255, 255, 0.15), rgba(0, 0, 0, 0.15));
-    mix-blend-mode: overlay; */
-/* pointer-events: none; */
-/* border-radius: 3px; */
-/* } */
 
 table,
 .cell {
@@ -47,6 +48,10 @@ table,
     text-align: center;
     font-size: 30px;
     margin: 20px auto;
+}
+
+.smiley span:hover {
+    cursor: pointer;
 }
 
 .level {
@@ -93,4 +98,27 @@ table,
     background: linear-gradient(to bottom, #8a8a8a, #6b6b6b);
     font-family: Arial, sans-serif;
     color: #fff;
+}
+
+.hints {
+    width: fit-content;
+    height: fit-content;
+    display: block;
+    margin: 0 auto;
+    text-align: center;
+    font-size: 50px;
+}
+
+.hint {
+    margin: 0 10px;
+
+}
+
+.hint:hover {
+    cursor: pointer;
+
+}
+
+.clicked-hint {
+    text-shadow: 0px -19px 20px #CEC349;
 }

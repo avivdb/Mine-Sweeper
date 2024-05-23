@@ -11,16 +11,22 @@
 <body onload="onInit()">
 
     <div class="game">
+
         <h1>Mine Sweeper</h1>
-        <div class="level">Level:
+
+        <div class="level">
+            Level:
             <button onclick="setLevel('beginner')">Beginner</button>
             <button onclick="setLevel('medium')">Medium</button>
             <button onclick="setLevel('expert')">Expert</button>
         </div>
+        <div class="bestscore">Best Score: <span class="best-score-display"></span></div>
         <div class="smiley">
             😀
         </div>
+
         <div class="lives"></div>
+
         <div class="stopwatch">
 
             <div id="display">0.000</div>
@@ -30,6 +36,10 @@
         <table>
             <tbody class="board"></tbody>
         </table>
+
+        <div class="hints"><span onclick="getHint(this)" class="hint hint1">💡</span><span onclick="getHint(this)"
+                class="hint hint2">💡</span><span onclick="getHint(this)" class="hint hint3">💡</span></div>
+
         <footer>Aviv Baron</footer>
         <script src="scripts/utils.js"></script>
         <script src="scripts/main.js"></script>

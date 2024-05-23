@@ -10,6 +10,7 @@ var gLevel = {
     SIZE: 4,
     MINES: 2
 }
+
 var numCellClick = 0
 var gBoard = []
 var gMinePositions = []
@@ -17,14 +18,17 @@ const MINE = '💣'
 const FLAG = '🏳️'
 var NUM_TO_SHOW = gLevel.SIZE ** 2 - gLevel.MINES
 
-
-
+gIsHint = false;
+var gNegsToHide = []
+var gBestScore = Infinity
 
 function onInit() {
     resetGame()
+    resetWatch()
+    resetHints()
     gBoard = buildBoard()
     console.table('gBoard:', gBoard);
-
+    // document.getElementById("result").innerHTML = localStorage.getItem("bestscore");
     renderBoard(gBoard)
 
 }
@@ -51,6 +55,10 @@ function checkGameOver() {
         console.log('you won');
         stopWatch()
         renderSmiley('😁')
+        if (elapsedTime < gBestScore) {
+            gBestScore = elapsedTime
+            localStorage.setItem("bestscore", gBestScore);
+        }
     }
 }
 
@@ -104,4 +112,74 @@ function renderLives() {
         str += '❤️'
     }
     elLives.innerText = str
+}
+
+function getHint(elHint) {
+    // console.log('elHint:', elHint);
+    if (elHint.classList.contains('clicked-hint')) return
+    elHint.classList.add('clicked-hint')
+    gIsHint = true;
+    const cells = document.querySelectorAll(".cell")
+    cells.forEach(cell => {
+        cell.addEventListener('click', hintclickedHandler)
+    })
+
+}
+
+function hintclickedHandler(event) {
+    elCell = event.target
+    var pos = getPosition(elCell)
+    console.log('elCell:', elCell);
+    console.log('pos:', pos);
+    revealNegs(pos.i, pos.j, gBoard)
+    setTimeout(() => {
+        hideNegs(gNegsToHide, gBoard)
+    }, 1000)
+    const cells = document.querySelectorAll(".cell")
+    cells.forEach(cell => {
+        cell.removeEventListener('click', hintclickedHandler)
+    })
+    gIsHint = false
+}
+
+function revealNegs(cellI, cellJ, mat) {
+
+    for (var i = cellI - 1; i <= cellI + 1; i++) {
+        if (i < 0 || i >= mat.length) continue
+        for (var j = cellJ - 1; j <= cellJ + 1; j++) {
+            if (j < 0 || j >= mat[i].length) continue
+            var cell = mat[i][j]
+            if (!cell.isShown) {
+                cell.isShown = true;
+                gNegsToHide.push({ i, j })
+            }
+            const className = `cell cell-${i}-${j}`
+            var strHTML = `<td  class="${className}"><span class="content">${cell.minesAroundCount}</span></td>`
+            renderCell({ i, j }, strHTML)
+        }
+    }
+
+
+}
+
+function hideNegs(cellsPoss, mat) {
+
+    for (var i = 0; i < gNegsToHide.length; i++) {
+        var posI = cellsPoss[i].i
+        var posJ = cellsPoss[i].j
+        var cell = mat[posI][posJ]
+        cell.isShown = false;
+        const className = `cell cell-${posI}-${posJ}`
+        var strHTML = `<td onclick="onCellClicked(this)" oncontextmenu="flagMine(event)" class="${className}"><span style="visibility:hidden" class="minesAroundCount">${cell}</span></td>`
+        renderCell(cellsPoss[i], strHTML)
+    }
+    gNegsToHide = []
+}
+
+function resetHints() {
+    var elhints = document.querySelector(".hints")
+    var strHTML = `<span onclick="getHint(this)" class="hint hint1">💡</span><span onclick="getHint(this)"
+    class="hint hint2">💡</span><span onclick="getHint(this)" class="hint hint3">💡</span>`
+    elhints.innerHTML = strHTML
+
 }

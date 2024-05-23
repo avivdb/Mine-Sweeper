@@ -103,5 +103,7 @@ function resetWatch() {
     // elapsedTime = 0;
     timerInterval = null
     running = false;
+    document.getElementById("display").textContent = (0).toFixed(3)
+
 
 }
