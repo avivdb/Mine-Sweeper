@@ -24,28 +24,31 @@ function buildBoard() {
 }
 
 function renderBoard(board) {
-
-    var strHTML = ''
+    var strHTML = '';
     for (var i = 0; i < board.length; i++) {
-        strHTML += '<tr>'
-
+        strHTML += '<tr>';
         for (var j = 0; j < board[0].length; j++) {
-            const cell = board[i][j]
-            const className = `cell cell-${i}-${j}`
-            strHTML += `<td onclick="onCellClicked(this)" oncontextmenu="flagMine(event)" class="${className}"><span style="visibility:hidden" class="minesAroundCount">${cell}</span></td>`
+            const cell = board[i][j];
+            const className = `cell cell-${i}-${j}`;
+            var strHTMLCell = '';
+            if (cell.isShown) {
+                strHTMLCell = `<td class="${className}">${cell.isMine ? MINE : cell.minesAroundCount}</td>`;
+            } else if (cell.isMarked) {
+                strHTMLCell = `<td onclick="onCellClicked(this)" oncontextmenu="flagMine(event)" class="${className}">${FLAG}</td>`;
+            } else {
+                strHTMLCell = `<td onclick="onCellClicked(this)" oncontextmenu="flagMine(event)" class="${className}"></td>`;
+            }
+            strHTML += strHTMLCell;
         }
-        strHTML += '</tr>'
+        strHTML += '</tr>';
     }
-    const elContainer = document.querySelector('.board')
-    elContainer.innerHTML = strHTML
-
+    const elContainer = document.querySelector('.board');
+    elContainer.innerHTML = strHTML;
 }
 
 function renderCell(location, value) {
-
-    const elCell = document.querySelector(`.cell-${location.i}-${location.j}`)
-    elCell.innerHTML = value
-
+    const elCell = document.querySelector(`.cell-${location.i}-${location.j}`);
+    elCell.innerHTML = value;
 }
 
 function onCellClicked(elCell) {
@@ -53,13 +56,17 @@ function onCellClicked(elCell) {
     if (!gGame.isOn) return
     if (gIsHint) return
     if (gIsMegaHint) return
+
+    if (gIsCreate) return
+
+
     var pos = getPosition(elCell)
     renderSmiley('😬')
     var cell = gBoard[pos.i][pos.j]
 
-    if (numCellClick === 0) {
+    if (gNumCellClick === 0) {
 
-        addMines(gLevel.MINES, pos)
+        if (!gIsAdd) addMines(gLevel.MINES, pos)
         setMinesNegsCount(gBoard)
         expandshown(pos.i, pos.j, gBoard)
         startWatch()
@@ -67,6 +74,9 @@ function onCellClicked(elCell) {
             renderSmiley('😀')
 
         }, 130)
+        removeCreateButton()
+
+
     }
     else {
         if (cell.isMarked || cell.isShown) return;
@@ -80,24 +90,22 @@ function onCellClicked(elCell) {
             cell.isShown = true
             gGame.shownCount++
             const className = `cell cell-${pos.i}-${pos.j}`
-            var strHTML = `<td  class="${className}"><span class="content">${cell.minesAroundCount}</span></td>`
+            var strHTML = `<td class="${className}">${cell.minesAroundCount}</td>`
 
             renderCell(pos, strHTML)
         }
     }
 
-    var gBoardCopy = [...gBoard]
-    gBoards.push(gBoardCopy)
-    console.table('gBoardCopy:', gBoardCopy);
+    saveGameState()
     checkGameOver()
     setTimeout(() => {
         renderSmiley('😀')
 
     }, 130)
-    numCellClick++
+    gNumCellClick++
 }
 
-function expandshown(cellI, cellJ, mat) { // 7,0
+function expandshown(cellI, cellJ, mat) {
 
     for (var i = cellI - 1; i <= cellI + 1; i++) {
         if (i < 0 || i >= mat.length) continue
@@ -116,7 +124,7 @@ function expandshown(cellI, cellJ, mat) { // 7,0
                 if (cell.minesAroundCount === 0) expandshown(i, j, mat)
 
             }
-            // expandshown(i, j, mat)
+
         }
     }
 
@@ -179,9 +187,4 @@ function flagMine(event) {
         }
     }
 
-}
-
-function renderSmiley(smiley) {
-    var elSmiley = document.querySelector(".smiley")
-    elSmiley.innerHTML = `<span onclick="onInit()">${smiley}</span>`
 }

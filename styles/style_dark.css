@@ -37,6 +37,19 @@ table {
     /* color: #FFFFFF; */
 }
 
+.mark {
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+    text-align: center;
+    vertical-align: middle;
+    background: linear-gradient(145deg, #caecd9, #f8efef);
+    border: 2px solid #333;
+    box-shadow: inset 0 0 5px #cfd6d1, inset 0 0 10px rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+
+}
+
 .cell:hover {
     background: linear-gradient(145deg, #5a5a5a, #4a4a4a);
     border: 2px solid #555;
@@ -72,6 +85,7 @@ table,
 
 button {
     width: 100px;
+    height: 50px;
     display: inline-block;
     margin: 10px 10px;
     background-color: #3a3a3a;
@@ -81,6 +95,13 @@ button {
     cursor: pointer;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    vertical-align: top;
+}
+
+.buttons {
+    width: fit-content;
+    margin: 0 auto;
 }
 
 button:hover {
@@ -144,6 +165,13 @@ button:hover {
     font-size: 24px;
     font-weight: 700;
 }
+
+.safe-click {
+    display: inline-block;
+    text-align: center;
+    vertical-align: top;
+}
+
 
 footer {
     margin-top: 50px;

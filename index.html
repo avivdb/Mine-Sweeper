@@ -15,22 +15,36 @@
         <h1>Mine Sweeper</h1>
 
         <div class="level">
+
             <button onclick="setLevel('beginner')">Beginner</button>
             <button onclick="setLevel('medium')">Medium</button>
             <button onclick="setLevel('expert')">Expert</button>
+
         </div>
 
         <div class="best-score">Best Score: <span id="best-score"></span></div>
 
-        <div>
+        <div class="buttons">
+
             <button class="dark-mode" onclick="changeStyleDark()">Dark Mode</button>
-            <!-- <button class="undo">Undo</button> -->
-            <!-- <button onclick="getMegaHint(this)">Mega Hint</button> -->
+            <button class="undo" onclick="undo()">Undo</button>
+            <button onclick="getMegaHint()">Mega Hint</button>
+
         </div>
 
-        <div class="smiley">
-            😀
+        <div class="buttons">
+
+            <div class="safe-click">
+                <button onclick="safeClick()">Safe Click</button>
+                <div><span class="num-safe-clicks">3</span> clicks available</div>
+            </div>
+
+            <button onclick="exterminator()">Exterminator</button>
+            <button onclick="createManually()" class="create-button">manually create</button>
+
         </div>
+
+        <div class="smiley"> 😀 </div>
 
         <div class="lives"></div>
 
@@ -50,6 +64,7 @@
         <script src="scripts/utils.js"></script>
         <script src="scripts/main.js"></script>
         <script src="scripts/game.js"></script>
+        <script src="scripts/buttons.js"></script>
 
     </div>
 
